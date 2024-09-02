@@ -1,14 +1,11 @@
 import { useAppState } from "../providers/AppState.jsx";
-import { useGroceryItems } from "../hooks/useGroceryItems.jsx";
+import { useGroceryList } from "../hooks/useGroceryList.jsx";
 import { useGroceryLists } from "../hooks/useGroceryLists.jsx";
 
 import { DeleteOutlineRounded, Send } from "@mui/icons-material";
 
 import * as Icons from "@mui/icons-material";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Drawer from "@mui/material/Drawer";
-import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
@@ -27,20 +24,17 @@ import { useState, useEffect } from "react";
 
 export default function CurrentGroceryList() {
   const { currentList } = useAppState();
+  const { data, toggleItem } = useGroceryList(currentList);
   const { updateList } = useGroceryLists();
-  const { data } = useGroceryItems(currentList);
   const [originalListName, setOriginalListName] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [items, setItems] = useState([]);
+  // const [items, setItems] = useState([]);
 
   useEffect(() => {
     if (data.name) {
       setOriginalListName(data.name);
     }
-    if (data.items) {
-      setItems(data.items);
-    }
-  }, [data.name, data.items]);
+  }, [data.name]);
 
   const Icon = Icons[data?.icon];
 
@@ -54,17 +48,8 @@ export default function CurrentGroceryList() {
     setIsEditing(false);
   };
 
-  const handleToggle = (id) => {
-    // Logic for toggling the purchased state of the item with the given id
-    const updatedItems = items.map((item) => {
-      if (item.id === id) {
-        const updatedItem = { ...item, purchased: !item.purchased };
-        updatedItem(updatedItem);
-        return updatedItem;
-      }
-      return item;
-    });
-    setItems(updatedItems);
+  const handleToggle = async (id) => {
+    await toggleItem(id);
   };
 
   const deleteItem = (id) => {

@@ -2,7 +2,7 @@ import useSWR from "swr";
 
 import { APIs, fetcher, putter } from "../utils.js";
 
-export function useGroceryItems(currentList) {
+export function useGroceryList(currentList) {
   // It triggers the fetcher function to retrieve data only for the specified currentList.
   const { data = { items: [] }, mutate } = useSWR(
     () => currentList && { url: APIs.GroceryItems, id: currentList },
@@ -16,9 +16,9 @@ export function useGroceryItems(currentList) {
     async newItem(newItemName) {
       return await mutate(
         await putter({
-          url: APIs.GroceryItemsAdd,
-          id: currentList,
+          url: APIs.GroceryItemAdd,
           name: newItemName,
+          listId: currentList,
         }),
         {
           populateCache: false,
@@ -37,7 +37,7 @@ export function useGroceryItems(currentList) {
     async updateItem(itemToUpdate, newItemName) {
       return await mutate(
         await putter({
-          url: APIs.GroceryItemsUpdate,
+          url: APIs.GroceryItemUpdate,
           id: itemToUpdate,
           name: newItemName,
         }),
@@ -56,10 +56,31 @@ export function useGroceryItems(currentList) {
         }
       );
     },
+    async toggleItem(itemToToggle) {
+      return await mutate(
+        await putter({
+          url: APIs.GroceryItemToggle,
+          id: itemToToggle,
+        }),
+        {
+          populateCache: false,
+          optimisticData: (oldData) => ({
+            ...oldData,
+            items: oldData.items.map((item) => {
+              if (item.id === itemToToggle) {
+                return { ...item, purchased: !item.purchased };
+              } else {
+                return item;
+              }
+            }),
+          }),
+        }
+      );
+    },
     async deleteItem(itemToDelete) {
       return await mutate(
         await putter({
-          url: APIs.GroceryItemsDelete,
+          url: APIs.GroceryItemDelete,
           id: itemToDelete,
         }),
         {
