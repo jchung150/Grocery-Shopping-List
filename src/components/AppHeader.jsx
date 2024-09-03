@@ -1,23 +1,44 @@
-import * as React from "react";
 import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
+import AddIcon from "@mui/icons-material/Add";
+import { useState } from "react";
+import NewListDialog from "./NewGroceryList.jsx";
 
 export default function AppHeader() {
+  const [isDialogActive, setIsDialogActive] = useState(false);
+
+  const handleClick = () => {
+    setIsDialogActive(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogActive(false);
+  };
+
   return (
-    <AppBar
-      position="fixed"
-      sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
-    >
-      <Toolbar>
-        <Typography variant="h6" noWrap component="div">
-          Grocery Shopping List
-        </Typography>
-      </Toolbar>
-    </AppBar>
+    <>
+      {isDialogActive && <NewListDialog onClose={handleCloseDialog} />}
+      <AppBar
+        position="fixed"
+        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      >
+        <Toolbar>
+          <Typography sx={{ flexGrow: 1 }} variant="h6" noWrap component="div">
+            Grocery Shopping List
+          </Typography>
+          <IconButton
+            size="large"
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            onClick={handleClick}
+          >
+            <AddIcon />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+    </>
   );
 }

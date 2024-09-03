@@ -26,7 +26,7 @@ export function useGroceryLists() {
     async updateList(listToUpdate, newListName) {
       await mutate(
         await putter({
-          url: APIs.GroceryListsUpdate,
+          url: APIs.GroceryListUpdate,
           id: listToUpdate,
           name: newListName,
         }),
@@ -45,7 +45,7 @@ export function useGroceryLists() {
     async deleteList(listToDelete) {
       await mutate(
         await putter({
-          url: APIs.GroceryListsDelete,
+          url: APIs.GroceryListDelete,
           id: listToDelete,
         }),
         {

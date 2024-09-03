@@ -81,9 +81,14 @@ export async function putter({ url, ...variables }) {
         icon: variables.icon,
       });
     case APIs.GroceryListUpdate:
+      console.log("Updating list in DB:", variables.id, variables.name);
       return db.groceryList.update(variables.id, { name: variables.name });
+    // making sure to delete both list and items that belong to that list
     case APIs.GroceryListDelete:
-      return db.groceryList.delete(variables.id);
+      return db.transaction("rw", db.groceryList, db.groceryItem, async () => {
+        await db.groceryItem.where({ listId: variables.id }).delete();
+        await db.groceryList.delete(variables.id);
+      });
     case APIs.GroceryItemAdd:
       return db.groceryItem.add({
         name: variables.name,
