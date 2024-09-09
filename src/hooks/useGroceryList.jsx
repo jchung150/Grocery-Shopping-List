@@ -24,10 +24,7 @@ export function useGroceryList(currentList) {
           populateCache: false,
           optimisticData: (oldData) => ({
             ...oldData,
-            items: [
-              ...oldData.items,
-              { name: newItemName, purchased: false, id: crypto.randomUUID() },
-            ],
+            items: [{ name: newItemName, purchased: false }],
           }),
         }
       );

@@ -20,18 +20,23 @@ import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
 import IconButton from "@mui/material/IconButton";
 import Modal from "@mui/material/Modal";
+import InputAdornment from "@mui/material/InputAdornment";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import { FilledInput } from "@mui/material";
 
 export default function CurrentGroceryList() {
   const { currentList, setCurrentList } = useAppState();
-  const { data: lists, updateList, deleteList } = useGroceryLists(); //
-  const { data, toggleItem } = useGroceryList(currentList); // currentList is ID
-  const [text, setText] = useState("");
+  const { data: lists, updateList, deleteList } = useGroceryLists();
+  const { data, toggleItem, deleteItem, newItem } = useGroceryList(currentList);
+  const [listName, setListName] = useState("");
+  const [itemName, setItemName] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (data) {
-      setText(data.name);
+      setListName(data.name);
     }
   }, [data]);
 
@@ -43,9 +48,8 @@ export default function CurrentGroceryList() {
 
   const Icon = Icons[data?.icon];
 
-  // async to be added later
   const handleSaveClick = async () => {
-    await updateList(currentList, text);
+    await updateList(currentList, listName);
     setIsEditing(false);
   };
 
@@ -53,37 +57,36 @@ export default function CurrentGroceryList() {
     setIsEditing(true);
   };
 
-  const handleDelete = async () => {
+  const handleDeleteList = async () => {
     await deleteList(currentList);
     handleClose();
-
-    // select the next list, if the current list is removed
     const currentIndex = lists.findIndex((list) => list.id === currentList);
-
     if (lists.length > 1) {
       if (currentIndex === lists.length - 1) {
-        // If last item, set to previous
         setCurrentList(lists[currentIndex - 1].id);
       } else {
-        // Set to next item
         setCurrentList(lists[currentIndex + 1].id);
       }
     } else {
-      setCurrentList(null); // No more lists
+      setCurrentList(null);
     }
+  };
+
+  const handleSaveItemClick = async (name) => {
+    await newItem(name);
+    setItemName("");
+  };
+
+  const handleToggleItem = async (id) => {
+    await toggleItem(id);
+  };
+
+  const handleDeleteItem = async (id) => {
+    await deleteItem(id);
   };
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
-  const handleToggle = async (id) => {
-    await toggleItem(id);
-  };
-
-  const deleteItem = (id) => {
-    // Logic for deleting the item with the given id
-    console.log("Deleting item:", id);
-  };
 
   if (!currentList) {
     return (
@@ -113,13 +116,13 @@ export default function CurrentGroceryList() {
           {isEditing ? (
             <TextField
               variant="outlined"
-              value={text}
+              value={listName}
               onChange={(e) => {
-                setText(e.target.value);
+                setListName(e.target.value);
               }}
             />
           ) : (
-            <Typography variant="h4">{text}</Typography>
+            <Typography variant="h4">{listName}</Typography>
           )}
           <IconButton
             edge="end"
@@ -159,7 +162,7 @@ export default function CurrentGroceryList() {
               <Button variant="outlined" onClick={handleClose}>
                 Cancel
               </Button>
-              <Button variant="contained" onClick={handleDelete}>
+              <Button variant="contained" onClick={handleDeleteList}>
                 Delete
               </Button>
             </Box>
@@ -186,7 +189,7 @@ export default function CurrentGroceryList() {
                   <IconButton
                     edge="end"
                     aria-label="delete"
-                    onClick={() => deleteItem(id)}
+                    onClick={() => handleDeleteItem(id)}
                   >
                     <DeleteOutlineRounded />
                   </IconButton>
@@ -195,7 +198,7 @@ export default function CurrentGroceryList() {
               >
                 <ListItemButton
                   role={undefined}
-                  onClick={() => handleToggle(id)}
+                  onClick={() => handleToggleItem(id)}
                   dense
                 >
                   <ListItemIcon>
@@ -213,6 +216,33 @@ export default function CurrentGroceryList() {
             );
           })}
         </List>
+      </Box>
+      <Box>
+        <Divider></Divider>
+        <Toolbar />
+        <FormControl fullWidth variant="filled">
+          <InputLabel htmlFor="filled-adornment-item">New Item</InputLabel>
+          <FilledInput
+            id="filled-adornment-item"
+            type="text"
+            value={itemName}
+            onChange={(e) => {
+              setItemName(e.target.value);
+            }}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="add item"
+                  onClick={() => handleSaveItemClick(itemName)}
+                  edge="end"
+                >
+                  <Send />
+                </IconButton>
+              </InputAdornment>
+            }
+            label="New Item"
+          />
+        </FormControl>
       </Box>
     </Box>
   );
