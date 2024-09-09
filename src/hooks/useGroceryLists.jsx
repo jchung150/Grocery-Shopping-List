@@ -10,9 +10,9 @@ export function useGroceryLists() {
     async newList(newListName, icon) {
       return await mutate(
         await putter({
-          url: APIs.GroceryLists,
-          icon: icon || "List",
+          url: APIs.GroceryListAdd,
           name: newListName,
+          icon: icon || "List",
         }),
         {
           populateCache: false,

@@ -8,7 +8,6 @@ import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 
 const drawerWidth = 240;
@@ -49,9 +48,7 @@ export default function AllGroceryLists() {
                 }}
                 selected={currentList === id}
               >
-                <ListItemIcon>
-                  <Icon />
-                </ListItemIcon>
+                {Icon ? <Icon /> : <Icons.List />}
                 <ListItemText primary={name} />
               </ListItemButton>
             </ListItem>
