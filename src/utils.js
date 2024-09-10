@@ -73,7 +73,7 @@ export async function fetcher({ url, ...variables }) {
 }
 
 // Add, update, delete data depending on URL address
-export async function putter({ url, ...variables }) {
+export async function putter({ url, id, ...variables }) {
   switch (url) {
     case APIs.GroceryListAdd:
       return db.groceryList.add({
@@ -81,27 +81,27 @@ export async function putter({ url, ...variables }) {
         icon: variables.icon,
       });
     case APIs.GroceryListUpdate:
-      return db.groceryList.update(variables.id, { name: variables.name });
+      return db.groceryList.update(id, { name: variables.name });
     case APIs.GroceryListDelete:
       return db.transaction("rw", db.groceryList, db.groceryItem, async () => {
-        await db.groceryItem.where({ listId: variables.id }).delete();
-        await db.groceryList.delete(variables.id);
+        await db.groceryItem.where({ listId: id }).delete();
+        await db.groceryList.delete(id);
       });
     case APIs.GroceryItemAdd:
       return db.groceryItem.add({
         name: variables.name,
         purchased: false,
-        listId: variables.id,
+        listId: id,
       });
     case APIs.GroceryItemDelete:
-      return db.groceryItem.delete(variables.id);
+      return db.groceryItem.delete(id);
     case APIs.GroceryItemUpdate:
-      return db.groceryItem.update(variables.id, {
+      return db.groceryItem.update(id, {
         name: variables.name,
       });
     case APIs.GroceryItemToggle:
-      const item = await db.groceryItem.get(variables.id);
-      return db.groceryItem.update(variables.id, {
+      const item = await db.groceryItem.get(id);
+      return db.groceryItem.update(id, {
         purchased: !item.purchased,
       });
     default:

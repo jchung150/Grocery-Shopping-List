@@ -49,7 +49,7 @@ export default function AllGroceryLists() {
                 selected={currentList === id}
               >
                 {Icon ? <Icon /> : <Icons.List />}
-                <ListItemText primary={name} />
+                <ListItemText sx={{ ml: 1 }} primary={name} />
               </ListItemButton>
             </ListItem>
           );

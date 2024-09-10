@@ -98,42 +98,72 @@ export default function CurrentGroceryList() {
   }
 
   return (
-    <Box sx={{ flexGrow: 1, p: 3 }}>
+    <Box
+      sx={{
+        flexGrow: 1,
+        p: 3,
+        flexShrink: 0,
+        minWidth: 500,
+        maxWidth: "100%",
+      }}
+    >
       <Toolbar />
       <Box sx={{ flex: 1 }}>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            mb: 1,
+          }}
+        >
+          {" "}
           <Box
             sx={{
-              border: (theme) => `1px solid ${theme.palette.divider}`,
-              p: 1,
-              mr: 1,
-              borderRadius: "50%",
               display: "flex",
+              alignItems: "center",
+              flexGrow: 1,
             }}
           >
-            {Icon ? <Icon fontSize="large" /> : <Icons.List fontSize="large" />}
-          </Box>
-          {isEditing ? (
-            <TextField
-              variant="outlined"
-              value={listName}
-              onChange={(e) => {
-                setListName(e.target.value);
+            <Box
+              sx={{
+                border: (theme) => `1px solid ${theme.palette.divider}`,
+                p: 1,
+                mr: 1,
+                borderRadius: "50%",
+                display: "flex",
               }}
-            />
-          ) : (
-            <Typography variant="h4">{listName}</Typography>
-          )}
-          <IconButton
-            edge="end"
-            aria-label="edit"
-            onClick={isEditing ? handleSaveClick : handleEditClick}
-          >
-            {isEditing ? <Send /> : <EditIcon />}
-          </IconButton>
-          <IconButton edge="end" aria-label="delete" onClick={handleOpen}>
-            <DeleteOutlineRounded />
-          </IconButton>
+            >
+              {Icon ? (
+                <Icon fontSize="large" />
+              ) : (
+                <Icons.List fontSize="large" />
+              )}
+            </Box>
+            {isEditing ? (
+              <TextField
+                variant="outlined"
+                value={listName}
+                onChange={(e) => {
+                  setListName(e.target.value);
+                }}
+              />
+            ) : (
+              <Typography variant="h4">{listName}</Typography>
+            )}
+          </Box>
+          <Box sx={{ mr: 2 }}>
+            <IconButton
+              sx={{ mr: 0.5 }}
+              edge="end"
+              aria-label="edit"
+              onClick={isEditing ? handleSaveClick : handleEditClick}
+            >
+              {isEditing ? <Send /> : <EditIcon />}
+            </IconButton>
+            <IconButton edge="end" aria-label="delete" onClick={handleOpen}>
+              <DeleteOutlineRounded />
+            </IconButton>
+          </Box>
           <Modal
             open={open}
             onClose={handleClose}
@@ -176,7 +206,7 @@ export default function CurrentGroceryList() {
             width: "100%",
             bgcolor: "background.paper",
             mx: "auto",
-            mt: 2,
+            mt: 1,
           }}
         >
           {data.items.map(({ id, name, purchased }) => {
@@ -184,6 +214,7 @@ export default function CurrentGroceryList() {
 
             return (
               <ListItem
+                sx={{ p: 1, my: 2, boxShadow: 2, borderRadius: 3 }}
                 key={id}
                 secondaryAction={
                   <IconButton
@@ -219,8 +250,7 @@ export default function CurrentGroceryList() {
       </Box>
       <Box>
         <Divider></Divider>
-        <Toolbar />
-        <FormControl fullWidth variant="filled">
+        <FormControl sx={{ mt: 3 }} fullWidth variant="filled">
           <InputLabel htmlFor="filled-adornment-item">New Item</InputLabel>
           <FilledInput
             id="filled-adornment-item"

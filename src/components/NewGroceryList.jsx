@@ -33,7 +33,7 @@ export default function NewListDialog({ onClose }) {
   }, [iconSearch]);
 
   const handleCreateListClick = async () => {
-    newList(iconSearch, icon);
+    newList(listName, icon);
     onClose();
   };
 

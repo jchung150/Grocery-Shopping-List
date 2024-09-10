@@ -18,7 +18,7 @@ export function useGroceryList(currentList) {
         await putter({
           url: APIs.GroceryItemAdd,
           name: newItemName,
-          listId: currentList,
+          id: currentList,
         }),
         {
           populateCache: false,
