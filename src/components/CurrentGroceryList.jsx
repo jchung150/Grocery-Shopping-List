@@ -3,7 +3,12 @@ import { useAppState } from "../providers/AppState.jsx";
 import { useGroceryList } from "../hooks/useGroceryList.jsx";
 import { useGroceryLists } from "../hooks/useGroceryLists.jsx";
 import { DeleteOutlineRounded, Send } from "@mui/icons-material";
-import useSpeechRecognition from "../hooks/useSpeechRecognition.jsx";
+// import useSpeechRecognition from "../hooks/useSpeechRecognition.jsx";
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMicrophone } from "@fortawesome/free-solid-svg-icons";
 import * as Icons from "@mui/icons-material";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -27,6 +32,13 @@ import InputLabel from "@mui/material/InputLabel";
 import { FilledInput } from "@mui/material";
 
 export default function CurrentGroceryList() {
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+  } = useSpeechRecognition();
+
   const { currentList, setCurrentList } = useAppState();
   const { data: lists, updateList, deleteList } = useGroceryLists();
   const { data, toggleItem, deleteItem, newItem } = useGroceryList(currentList);
@@ -34,9 +46,7 @@ export default function CurrentGroceryList() {
   const [itemName, setItemName] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [open, setOpen] = useState(false);
-
-  const { text, isListening, startListening, stopListening } =
-    useSpeechRecognition();
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (data) {
@@ -49,6 +59,24 @@ export default function CurrentGroceryList() {
       setCurrentList(null);
     }
   }, [currentList, setCurrentList]);
+
+  useEffect(() => {
+    if (!listening && transcript) {
+      setItemName(transcript);
+      resetTranscript();
+    }
+  }, [listening, transcript, resetTranscript]);
+
+  useEffect(() => {
+    SpeechRecognition.onError = (event) => {
+      console.error("Speech recognition error:", event.error);
+      setError(`Error: ${event.error}`);
+    };
+
+    return () => {
+      SpeechRecognition.onError = null;
+    };
+  }, []);
 
   const Icon = Icons[data?.icon];
 
@@ -255,7 +283,9 @@ export default function CurrentGroceryList() {
       <Box>
         <Divider></Divider>
         <FormControl sx={{ mt: 3 }} fullWidth variant="filled">
-          <InputLabel htmlFor="filled-adornment-item">New Item</InputLabel>
+          <InputLabel htmlFor="filled-adornment-item">
+            {listening ? "Listening..." : "New Item"}
+          </InputLabel>
           <FilledInput
             id="filled-adornment-item"
             type="text"
@@ -263,8 +293,23 @@ export default function CurrentGroceryList() {
             onChange={(e) => {
               setItemName(e.target.value);
             }}
+            disabled={listening}
             endAdornment={
               <InputAdornment position="end">
+                {browserSupportsSpeechRecognition ? (
+                  <IconButton
+                    aria-label="speak to add item"
+                    edge="end"
+                    onClick={() =>
+                      SpeechRecognition.startListening({
+                        continuous: false,
+                        language: "en-US",
+                      })
+                    }
+                  >
+                    <FontAwesomeIcon icon={faMicrophone} />
+                  </IconButton>
+                ) : null}
                 <IconButton
                   aria-label="add item"
                   onClick={() => handleSaveItemClick(itemName)}
@@ -278,21 +323,12 @@ export default function CurrentGroceryList() {
           />
         </FormControl>
       </Box>
-      <Box sx={{ mt: 4 }}>
-        <Button variant="contained" onClick={startListening}>
-          Ask AI to generate items
-        </Button>
-        <Button variant="contained" onClick={stopListening} sx={{ ml: 2 }}>
-          Stop
-        </Button>
-        {isListening ? (
-          <Typography variant="caption" sx={{ display: "block", mt: 1 }}>
-            Listening...
+      <Box sx={{ mt: 2 }}>
+        {error && (
+          <Typography variant="caption" color="error" sx={{ mt: 1 }}>
+            {error}
           </Typography>
-        ) : null}
-        <Typography variant="h6" sx={{ mt: 1 }}>
-          {text}
-        </Typography>
+        )}
       </Box>
     </Box>
   );
