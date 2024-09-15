@@ -3,6 +3,7 @@ import { useAppState } from "../providers/AppState.jsx";
 import { useGroceryList } from "../hooks/useGroceryList.jsx";
 import { useGroceryLists } from "../hooks/useGroceryLists.jsx";
 import { DeleteOutlineRounded, Send } from "@mui/icons-material";
+import useSpeechRecognition from "../hooks/useSpeechRecognition.jsx";
 import * as Icons from "@mui/icons-material";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -33,6 +34,9 @@ export default function CurrentGroceryList() {
   const [itemName, setItemName] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [open, setOpen] = useState(false);
+
+  const { text, isListening, startListening, stopListening } =
+    useSpeechRecognition();
 
   useEffect(() => {
     if (data) {
@@ -273,6 +277,22 @@ export default function CurrentGroceryList() {
             label="New Item"
           />
         </FormControl>
+      </Box>
+      <Box sx={{ mt: 4 }}>
+        <Button variant="contained" onClick={startListening}>
+          Ask AI to generate items
+        </Button>
+        <Button variant="contained" onClick={stopListening} sx={{ ml: 2 }}>
+          Stop
+        </Button>
+        {isListening ? (
+          <Typography variant="caption" sx={{ display: "block", mt: 1 }}>
+            Listening...
+          </Typography>
+        ) : null}
+        <Typography variant="h6" sx={{ mt: 1 }}>
+          {text}
+        </Typography>
       </Box>
     </Box>
   );
