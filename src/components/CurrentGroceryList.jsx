@@ -3,7 +3,6 @@ import { useAppState } from "../providers/AppState.jsx";
 import { useGroceryList } from "../hooks/useGroceryList.jsx";
 import { useGroceryLists } from "../hooks/useGroceryLists.jsx";
 import { DeleteOutlineRounded, Send } from "@mui/icons-material";
-// import useSpeechRecognition from "../hooks/useSpeechRecognition.jsx";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
@@ -30,6 +29,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import { FilledInput } from "@mui/material";
+import RecipeList from "./RecipeList.jsx";
 
 export default function CurrentGroceryList() {
   const {
@@ -41,18 +41,24 @@ export default function CurrentGroceryList() {
 
   const { currentList, setCurrentList } = useAppState();
   const { data: lists, updateList, deleteList } = useGroceryLists();
-  const { data, toggleItem, deleteItem, newItem } = useGroceryList(currentList);
+  const {
+    data: items,
+    toggleItem,
+    deleteItem,
+    newItem,
+  } = useGroceryList(currentList);
   const [listName, setListName] = useState("");
   const [itemName, setItemName] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [open, setOpen] = useState(false);
   const [error, setError] = useState(null);
+  const ingredients = items.items.map((item) => item.name);
 
   useEffect(() => {
-    if (data) {
-      setListName(data.name);
+    if (items) {
+      setListName(items.name);
     }
-  }, [data]);
+  }, [items]);
 
   useEffect(() => {
     if (!currentList) {
@@ -78,7 +84,7 @@ export default function CurrentGroceryList() {
     };
   }, []);
 
-  const Icon = Icons[data?.icon];
+  const Icon = Icons[items?.icon];
 
   const handleSaveClick = async () => {
     await updateList(currentList, listName);
@@ -241,7 +247,7 @@ export default function CurrentGroceryList() {
             mt: 1,
           }}
         >
-          {data.items.map(({ id, name, purchased }) => {
+          {items.items.map(({ id, name, purchased }) => {
             const labelId = `checkbox-list-label-${id}`;
 
             return (
@@ -330,6 +336,8 @@ export default function CurrentGroceryList() {
           </Typography>
         )}
       </Box>
+      {console.log(ingredients)}
+      <RecipeList ingredients={ingredients} />
     </Box>
   );
 }
