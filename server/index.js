@@ -9,13 +9,10 @@ console.log("PORT:", process.env.PORT);
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// app.use(cors({ origin: "http://localhost:5173" }));
 app.use(cors());
 
 const API_KEY = process.env.SPOONACULAR_API_KEY;
 const BASE_URL = "https://api.spoonacular.com";
-
-console.log("Spoonacular API Key:", API_KEY);
 
 app.get("/api/recipes", async (req, res) => {
   const ingredients = req.query.ingredients;
@@ -52,6 +49,36 @@ app.get("/api/recipes", async (req, res) => {
   } catch (error) {
     console.error("Error fetching recipes:", error.message);
     res.status(500).json({ error: "Failed to fetch recipes." });
+  }
+});
+
+app.get("/api/recipes/:id/information", async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return res.status(400).json({ error: "Recipe ID is required." });
+  }
+  try {
+    const externalApiUrl = `${BASE_URL}/recipes/${id}/information`;
+    const response = await axios.get(externalApiUrl, {
+      params: {
+        apiKey: API_KEY,
+      },
+      timeout: 10000,
+    });
+    res.status(200).json(response.data);
+  } catch (error) {
+    console.error(`Error fetching recipe with ID ${id}: `, error.message);
+    if (error.response) {
+      res.status(error.response.status).json({
+        error:
+          error.response.data.message || "Error fetching recipe information.",
+      });
+    } else if (error.request) {
+      res.status(503).json({ error: "External API is unavailable." });
+    } else {
+      res.status(500).json({ error: "Internal server error." });
+    }
   }
 });
 
