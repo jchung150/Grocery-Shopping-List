@@ -15,7 +15,6 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import EditIcon from "@mui/icons-material/Edit";
-import Chip from "@mui/material/Chip";
 import Button from "@mui/material/Button";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -51,6 +50,7 @@ export default function CurrentGroceryList() {
   const [itemName, setItemName] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [open, setOpen] = useState(false);
+  const [recipeOpen, setRecipeOpen] = useState(false);
   const [error, setError] = useState(null);
   const ingredients = items.items.map((item) => item.name);
 
@@ -126,6 +126,10 @@ export default function CurrentGroceryList() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  const handleRecipeGenerator = async () => {
+    setRecipeOpen(!recipeOpen);
+  };
+
   if (!currentList) {
     return (
       <Box sx={{ flexGrow: 1, p: 3 }}>
@@ -140,9 +144,10 @@ export default function CurrentGroceryList() {
       sx={{
         flexGrow: 1,
         p: 3,
-        flexShrink: 0,
-        minWidth: 500,
+        flexShrink: 1,
+        width: "100%",
         maxWidth: "100%",
+        minWidth: "50vw",
       }}
     >
       <Toolbar />
@@ -236,9 +241,7 @@ export default function CurrentGroceryList() {
             </Box>
           </Modal>
         </Box>
-        <Divider>
-          <Chip label="Items" size="small" />
-        </Divider>
+        <Divider></Divider>
         <List
           sx={{
             width: "100%",
@@ -336,8 +339,35 @@ export default function CurrentGroceryList() {
           </Typography>
         )}
       </Box>
-      {console.log(ingredients)}
-      <RecipeList ingredients={ingredients} />
+      {recipeOpen ? (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end",
+          }}
+        >
+          <Button onClick={handleRecipeGenerator} variant="contained">
+            Close Recipe
+          </Button>
+        </Box>
+      ) : (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end",
+          }}
+        >
+          <Button onClick={handleRecipeGenerator} variant="contained">
+            Generate Recipes
+          </Button>
+          <Typography variant="caption" color="textSecondary" sx={{ mt: 1 }}>
+            AI will generate recipes based on the ingredients you have.
+          </Typography>
+        </Box>
+      )}
+      {recipeOpen ? <RecipeList ingredients={ingredients} /> : ""}
     </Box>
   );
 }

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
@@ -7,45 +8,12 @@ import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShareIcon from "@mui/icons-material/Share";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { styled } from "@mui/material/styles";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import Collapse from "@mui/material/Collapse";
 import { findRecipeByIngredients } from "../api/recipeAPI";
-
-const ExpandMore = styled((props) => {
-  const { ...other } = props;
-  return <IconButton {...other} />;
-})(({ theme }) => ({
-  marginLeft: "auto",
-  transition: theme.transitions.create("transform", {
-    duration: theme.transitions.duration.shortest,
-  }),
-  variants: [
-    {
-      props: ({ expand }) => !expand,
-      style: {
-        transform: "rotate(0deg)",
-      },
-    },
-    {
-      props: ({ expand }) => !!expand,
-      style: {
-        transform: "rotate(180deg)",
-      },
-    },
-  ],
-}));
 
 export default function RecipeList({ ingredients }) {
   const [recipes, setRecipes] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [expanded, setExpanded] = useState(false);
-
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -68,29 +36,53 @@ export default function RecipeList({ ingredients }) {
     }
   }, [ingredients]);
 
-  if (isLoading) return <p>Loading recipes...</p>;
-  if (error) return <p>Error: {error} </p>;
+  if (isLoading) return <Typography>Loading recipes...</Typography>;
+  if (error) return <Typography color="error">Error: {error}</Typography>;
   if (recipes.length === 0)
-    return <p>No recipes found. Try adding some ingredients!</p>;
+    return (
+      <Typography>No recipes found. Try adding some ingredients!</Typography>
+    );
 
   return (
-    <div>
+    <Box
+      sx={{
+        display: "flex",
+        flexWrap: "wrap",
+        justifyContent: "space-between",
+        mt: 3,
+        m: 2,
+        p: 1,
+      }}
+    >
       {recipes.map((recipe) => (
-        <Card sx={{ maxWidth: 345 }} key={recipe.id}>
+        <Card sx={{ width: 250, height: 350 }} key={recipe.id}>
           <CardMedia
-            sx={{ height: 140 }}
+            sx={{ height: 140, width: "100%", objectFit: "cover" }}
+            component="img"
+            alt="recipe image"
             image={recipe.image}
             title={recipe.title}
           />
-          <CardContent>
-            <Typography gutterBottom variant="h5" component="div">
+          <CardContent sx={{ paddingBottom: 0 }}>
+            <Typography
+              gutterBottom
+              variant="h6"
+              component="div"
+              sx={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+              }}
+            >
               {recipe.title}
             </Typography>
             <Typography variant="body2" sx={{ color: "text.secondary" }}>
               Missing Ingredients:
             </Typography>
             {recipe.missedIngredients.length > 0 ? (
-              recipe.missedIngredients.map((ingredient) => (
+              recipe.missedIngredients.slice(0, 3).map((ingredient) => (
                 <Typography
                   key={ingredient.id}
                   variant="body2"
@@ -104,58 +96,22 @@ export default function RecipeList({ ingredients }) {
                 None! You have all the ingredients.
               </Typography>
             )}
+            {recipe.missedIngredients.length > 3 && (
+              <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                ...and {recipe.missedIngredients.length - 3} more
+              </Typography>
+            )}
           </CardContent>
-          <CardActions>
-            <IconButton aria-label="add to favorites">
+          <CardActions sx={{ marginTop: "auto" }}>
+            {/* <IconButton aria-label="add to favorites">
               <FavoriteIcon />
             </IconButton>
             <IconButton aria-label="share">
               <ShareIcon />
-            </IconButton>
-            <ExpandMore
-              expand={expanded}
-              onClick={handleExpandClick}
-              aria-expanded={expanded}
-              aria-label="show more"
-            >
-              <ExpandMoreIcon />
-            </ExpandMore>{" "}
+            </IconButton> */}
           </CardActions>
-          <Collapse in={expanded} timeout="auto" unmountOnExit>
-            <CardContent>
-              <Typography sx={{ marginBottom: 2 }}>Method:</Typography>
-              <Typography sx={{ marginBottom: 2 }}>
-                Heat 1/2 cup of the broth in a pot until simmering, add saffron
-                and set aside for 10 minutes.
-              </Typography>
-              <Typography sx={{ marginBottom: 2 }}>
-                Heat oil in a (14- to 16-inch) paella pan or a large, deep
-                skillet over medium-high heat. Add chicken, shrimp and chorizo,
-                and cook, stirring occasionally until lightly browned, 6 to 8
-                minutes. Transfer shrimp to a large plate and set aside, leaving
-                chicken and chorizo in the pan. Add pimentón, bay leaves,
-                garlic, tomatoes, onion, salt and pepper, and cook, stirring
-                often until thickened and fragrant, about 10 minutes. Add
-                saffron broth and remaining 4 1/2 cups chicken broth; bring to a
-                boil.
-              </Typography>
-              <Typography sx={{ marginBottom: 2 }}>
-                Add rice and stir very gently to distribute. Top with artichokes
-                and peppers, and cook without stirring, until most of the liquid
-                is absorbed, 15 to 18 minutes. Reduce heat to medium-low, add
-                reserved shrimp and mussels, tucking them down into the rice,
-                and cook again without stirring, until mussels have opened and
-                rice is just tender, 5 to 7 minutes more. (Discard any mussels
-                that don&apos;t open.)
-              </Typography>
-              <Typography>
-                Set aside off of the heat to let rest for 10 minutes, and then
-                serve.
-              </Typography>
-            </CardContent>
-          </Collapse>
         </Card>
       ))}
-    </div>
+    </Box>
   );
 }
