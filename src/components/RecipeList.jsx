@@ -1,19 +1,18 @@
 import { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
-import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import ShareIcon from "@mui/icons-material/Share";
 import { findRecipeByIngredients } from "../api/recipeAPI";
+import Recipe from "./Recipe";
 
 export default function RecipeList({ ingredients }) {
   const [recipes, setRecipes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedRecipeId, setSelectedRecipeId] = useState(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -43,6 +42,16 @@ export default function RecipeList({ ingredients }) {
       <Typography>No recipes found. Try adding some ingredients!</Typography>
     );
 
+  const handleClick = (id) => {
+    setSelectedRecipeId(id);
+    setDialogOpen(true);
+  };
+
+  const handleClose = () => {
+    setDialogOpen(false);
+    setSelectedRecipeId(null);
+  };
+
   return (
     <Box
       sx={{
@@ -55,7 +64,11 @@ export default function RecipeList({ ingredients }) {
       }}
     >
       {recipes.map((recipe) => (
-        <Card sx={{ width: 250, height: 350 }} key={recipe.id}>
+        <Card
+          sx={{ width: 250, height: 350 }}
+          key={recipe.id}
+          onClick={() => handleClick(recipe.id)}
+        >
           <CardMedia
             sx={{ height: 140, width: "100%", objectFit: "cover" }}
             component="img"
@@ -102,16 +115,11 @@ export default function RecipeList({ ingredients }) {
               </Typography>
             )}
           </CardContent>
-          <CardActions sx={{ marginTop: "auto" }}>
-            {/* <IconButton aria-label="add to favorites">
-              <FavoriteIcon />
-            </IconButton>
-            <IconButton aria-label="share">
-              <ShareIcon />
-            </IconButton> */}
-          </CardActions>
         </Card>
       ))}
+      {selectedRecipeId && (
+        <Recipe id={selectedRecipeId} open={dialogOpen} onClose={handleClose} />
+      )}
     </Box>
   );
 }

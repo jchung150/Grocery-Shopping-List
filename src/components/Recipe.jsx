@@ -1,6 +1,5 @@
-import { useState, Fragment } from "react";
+import { useState, useEffect, useRef, Fragment } from "react";
 import Button from "@mui/material/Button";
-import { styled } from "@mui/material/styles";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -8,44 +7,56 @@ import DialogActions from "@mui/material/DialogActions";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import Typography from "@mui/material/Typography";
+import parse from "html-react-parser";
 
 import { findRecipeById } from "../api/recipeAPI";
+import { DialogContentText } from "@mui/material";
 
-const BootstrapDialog = styled(Dialog)(({ theme }) => ({
-  "& .MuiDialogContent-root": {
-    padding: theme.spacing(2),
-  },
-  "& .MuiDialogActions-root": {
-    padding: theme.spacing(1),
-  },
-}));
+export default function Recipe({ id, open, onClose }) {
+  const [scroll, setScroll] = useState("paper");
+  const [error, setError] = useState(null);
+  const [recipe, setRecipe] = useState(null);
 
-export default function Recipe() {
-  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (id && open) {
+      const fetchRecipe = async () => {
+        try {
+          const data = await findRecipeById(id);
+          setScroll("paper");
+          setRecipe(data);
+        } catch (error) {
+          setError(error.message);
+        }
+      };
+      fetchRecipe();
+    }
+  }, [id, open]);
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
+  const descriptionElementRef = useRef(null);
+  useEffect(() => {
+    if (open) {
+      const { current: descriptionElement } = descriptionElementRef;
+      if (descriptionElement !== null) {
+        descriptionElement.focus();
+      }
+    }
+  }, [open]);
+
+  if (error) return <Typography color="error">Error: {error}</Typography>;
+  if (!recipe) return <Typography>No recipe found.</Typography>;
 
   return (
     <Fragment>
-      <Button variant="outlined" onClick={handleClickOpen}>
-        Open dialog
-      </Button>
-      <BootstrapDialog
-        onClose={handleClose}
-        aria-labelledby="customized-dialog-title"
+      <Dialog
         open={open}
+        onClose={onClose}
+        scroll={scroll}
+        aria-labelledby="scroll-dialog-title"
       >
-        <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
-          Modal title
-        </DialogTitle>
+        <DialogTitle id="scroll-dialog-title">{recipe.title}</DialogTitle>
         <IconButton
           aria-label="close"
-          onClick={handleClose}
+          onClick={onClose}
           sx={(theme) => ({
             position: "absolute",
             right: 8,
@@ -55,29 +66,25 @@ export default function Recipe() {
         >
           <CloseIcon />
         </IconButton>
-        <DialogContent dividers>
-          <Typography gutterBottom>
-            Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
-            dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta
-            ac consectetur ac, vestibulum at eros.
-          </Typography>
-          <Typography gutterBottom>
-            Praesent commodo cursus magna, vel scelerisque nisl consectetur et.
-            Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor
-            auctor.
-          </Typography>
-          <Typography gutterBottom>
-            Aenean lacinia bibendum nulla sed consectetur. Praesent commodo
-            cursus magna, vel scelerisque nisl consectetur et. Donec sed odio
-            dui. Donec ullamcorper nulla non metus auctor fringilla.
-          </Typography>
+        <DialogContent dividers={scroll === "paper"}>
+          <DialogContentText
+            id="scroll-dialog-description"
+            ref={descriptionElementRef}
+            tabIndex={-1}
+          >
+            <strong>Be Ready In:</strong> {recipe?.readyInMinutes} minutes
+            <br />
+            <strong>Servings:</strong> {recipe?.servings}
+            <br />
+            <strong>Instructions:</strong> {parse(recipe?.summary)}
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button autoFocus onClick={handleClose}>
-            Save changes
+          <Button autoFocus onClick={onClose} color="primary">
+            Close
           </Button>
         </DialogActions>
-      </BootstrapDialog>
+      </Dialog>
     </Fragment>
   );
 }

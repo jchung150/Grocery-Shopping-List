@@ -54,7 +54,6 @@ export default function AllGroceryLists() {
             </ListItem>
           );
         })}
-        ;
       </List>
     </Drawer>
   );
