@@ -17,6 +17,3 @@
   to = "/.netlify/functions/getRecipeInformation?id=:id"
   status = 200
   force = true
-
-[build.environment]
-  NODE_VERSION = "18.x"
