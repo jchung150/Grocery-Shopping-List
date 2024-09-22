@@ -12,19 +12,23 @@ Intelligent Grocery Shopping Cart is a sophisticated application that allows use
 
 ### Home Page
 
-![Home Page](path_to_your_image/home-page.png)
+<img src="./assets/readme/gsl01.png" alt="Home Page" width="300"/>
 
-### Adding Items
+### Adding List
 
-![Adding Items](path_to_your_image/adding-items.png)
+<img src="./assets/readme/gsl02.png" alt="Adding List" width="300"/>
 
-### Voice Control Feature
+### Voice Controlled Item Addition
 
-![Voice Control](path_to_your_image/voice-control.png)
+<img src="./assets/readme/gsl04.png" alt="Adding List" width="300"/>
 
 ### Recipe Recommendations
 
-![Recipe Recommendations](path_to_your_image/recipe-recommendations.png)
+<img src="./assets/readme/gsl05.png" alt="Adding List" width="300"/>
+
+### Recipe Summary
+
+<img src="./assets/readme/gsl06.png" alt="Adding List" width="300"/>
 
 ## Features
 
@@ -97,12 +101,20 @@ To run the application locally, follow these steps:
 1. **Start the Development Server**
 
    ```bash
-   npm run dev
+   cd server
+   ```
+
+   ```bash
+   npm start
    ```
 
 2. **Open in Browser**
 
-   - Once the server is running, navigate to `http://localhost:3000` in your web browser to view the application.
+   - Once the server is running, run the following code to view the application in your web browser
+
+   ```bash
+   npm run dev
+   ```
 
 ## Authors
 
