@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "/.netlify/functions";
+const BASE_URL = "/api";
 
 export const findRecipeByIngredients = async (ingredients) => {
   const params = {
